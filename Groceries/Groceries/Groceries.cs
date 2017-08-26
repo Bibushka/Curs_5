@@ -33,12 +33,37 @@ namespace Groceries
             Assert.AreEqual(60, CalculateTotal(groceriesCart));
         }
 
+        [TestMethod]
+        public void GetLesserPriceFail()
+        {
+            var groceriesCart = new Produse[]
+            { new Produse("Bread", 4), new Produse("Wine", 56), new Produse("Milk", 8) };
+            Assert.AreEqual(8, CalculateSmallerPrice(groceriesCart));
+        }
+
+        [TestMethod]
+        public void GetLesserPrice()
+        {
+            var groceriesCart = new Produse[]
+            { new Produse("Bread", 4), new Produse("Wine", 56), new Produse("Milk", 8) };
+            Assert.AreEqual(4, CalculateSmallerPrice(groceriesCart));
+        }
+
         public double CalculateTotal(Produse[] groceriesCart)
         {
             double total = 0;
             for (int i = 0; i < groceriesCart.Length; i++)
                 total += groceriesCart[i].price;
             return total;
+        }
+
+        public double CalculateSmallerPrice(Produse[] groceriesCart)
+        {
+            double smallestPrice = groceriesCart[0].price;
+            for (int i = 1; i < groceriesCart.Length; i++)
+                if (groceriesCart[i].price < smallestPrice)
+                    smallestPrice = groceriesCart[i].price;
+            return smallestPrice;
         }
     }
 }
