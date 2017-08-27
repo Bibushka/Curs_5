@@ -49,6 +49,15 @@ namespace Groceries
             Assert.AreEqual(4, CalculateSmallerPrice(groceriesCart));
         }
 
+        [TestMethod]
+        public void EliminateTheMostExpensiveItem()
+        {
+            var groceriesCart = new Produse[]
+            { new Produse("Bread", 4), new Produse("Wine", 56), new Produse("Milk", 8) };
+            EliminateExpensiveItem(groceriesCart);
+            Assert.AreEqual(8, CalculateGreaterPrice(groceriesCart));
+        }
+
         public double CalculateTotal(Produse[] groceriesCart)
         {
             double total = 0;
@@ -64,6 +73,30 @@ namespace Groceries
                 if (groceriesCart[i].price < smallestPrice)
                     smallestPrice = groceriesCart[i].price;
             return smallestPrice;
+        }
+
+        public double CalculateGreaterPrice(Produse[] groceriesCart)
+        {
+            double greaterPrice = groceriesCart[0].price;
+            for (int i = 1; i < groceriesCart.Length; i++)
+                if (groceriesCart[i].price > greaterPrice)
+                    greaterPrice = groceriesCart[i].price;
+            return greaterPrice;
+        }
+
+        public void EliminateExpensiveItem(Produse[] groceriesCart)
+        {
+            int index = 0;
+            double greaterPrice = groceriesCart[0].price;
+            for (int i = 0; i < groceriesCart.Length; i++)
+                if (groceriesCart[i].price > greaterPrice)
+                {
+                    greaterPrice = groceriesCart[i].price;
+                    index = i;
+                }
+            for (int i = index; i < groceriesCart.Length-1; i++)
+                groceriesCart[i] = groceriesCart[i + 1];
+            Array.Resize(ref groceriesCart, groceriesCart.Length-1);
         }
     }
 }
