@@ -110,7 +110,7 @@ namespace Groceries
             return index;
         }
 
-        public Array EliminateExpensiveItem(Product[] groceriesCart)
+        public Product[] EliminateExpensiveItem(Product[] groceriesCart)
         {
             for (int i = GetIndexForTheMostExpensiveProduct(groceriesCart); i < groceriesCart.Length-1; i++)
                 groceriesCart[i] = groceriesCart[i + 1];
@@ -118,7 +118,7 @@ namespace Groceries
             return groceriesCart;
         }
 
-        public Array AddNewProduct(string name, int price, Product[] groceriesCart)
+        public Product[] AddNewProduct(string name, int price, Product[] groceriesCart)
         {
             Array.Resize(ref groceriesCart, groceriesCart.Length + 1);
             groceriesCart[groceriesCart.Length - 1] = new Product(name, price);
