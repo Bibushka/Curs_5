@@ -38,7 +38,7 @@ namespace Groceries
         {
             var groceriesCart = new Product[]
             { new Product("Bread", 4), new Product("Wine", 56), new Product("Milk", 8) };
-            Assert.AreEqual(8, CalculateSmallerPrice(groceriesCart));
+            Assert.AreEqual(1, GetIndexForLessExpensiveProduct(groceriesCart));
         }
 
         [TestMethod]
@@ -46,24 +46,34 @@ namespace Groceries
         {
             var groceriesCart = new Product[]
             { new Product("Bread", 4), new Product("Wine", 56), new Product("Milk", 8) };
-            Assert.AreEqual(4, CalculateSmallerPrice(groceriesCart));
+            Assert.AreEqual(0, GetIndexForLessExpensiveProduct(groceriesCart));
         }
 
         [TestMethod]
         public void EliminateTheMostExpensiveItem()
         {
             var groceriesCart = new Product[]
-            { new Product("Bread", 9), new Product("Wine", 56), new Product("Milk", 8) };
-            EliminateExpensiveItem(groceriesCart);
-            Assert.AreEqual(0, CalculateGreaterPrice(groceriesCart));
+            { new Product("Bread", 4), new Product("Wine", 56), new Product("Milk", 8) };
+            Product[] newGroceriesCart = (Product[]) EliminateExpensiveItem(groceriesCart);
+            Assert.AreEqual(2, newGroceriesCart.Length);
+            Assert.AreEqual(1, GetIndexForTheMostExpensiveProduct(newGroceriesCart));
         }
 
         [TestMethod]
-        public void AddProduceToCart()
+        public void AddProductToCart()
         {
             var groceriesCart = new Product[]
-            { new Product("Bread", 4), new Product("Wine", 56), new Product("Milk", 8) };
+            {new Product("Bread", 4), new Product("Wine", 56), new Product("Milk", 8) };
+            Product[] newGroceriesCart = (Product[]) AddNewProduct("Sugar", 6, groceriesCart);
+            Assert.AreEqual(4, newGroceriesCart.Length);
+        }
 
+        [TestMethod]
+        public void GetMidPriceInCart()
+        {
+            var groceriesCart = new Product[]
+            {new Product("Bread", 4), new Product("Wine", 56), new Product("Milk", 9) };
+            Assert.AreEqual(23, CalculateMidPriceInCart(groceriesCart));
         }
 
         public double CalculateTotal(Product[] groceriesCart)
@@ -74,18 +84,22 @@ namespace Groceries
             return total;
         }
 
-        public double CalculateSmallerPrice(Product[] groceriesCart)
+        public int GetIndexForLessExpensiveProduct(Product[] groceriesCart)
         {
-            double smallestPrice = groceriesCart[0].price;
+            double smallestPrice = 0;
+            int index = 0;
             for (int i = 1; i < groceriesCart.Length; i++)
                 if (groceriesCart[i].price < smallestPrice)
+                {
                     smallestPrice = groceriesCart[i].price;
-            return smallestPrice;
+                    index = i;
+                }
+            return index;
         }
 
-        public int CalculateGreaterPrice(Product[] groceriesCart)
+        public int GetIndexForTheMostExpensiveProduct(Product[] groceriesCart)
         {
-            double greaterPrice = groceriesCart[0].price;
+            double greaterPrice = 0;
             int index = 0;
             for (int i = 1; i < groceriesCart.Length; i++)
                 if (groceriesCart[i].price > greaterPrice)
@@ -96,12 +110,24 @@ namespace Groceries
             return index;
         }
 
-        public void EliminateExpensiveItem(Product[] groceriesCart)
+        public Array EliminateExpensiveItem(Product[] groceriesCart)
         {
-            int index = CalculateGreaterPrice(groceriesCart);
-            for (int i = index; i < groceriesCart.Length-1; i++)
+            for (int i = GetIndexForTheMostExpensiveProduct(groceriesCart); i < groceriesCart.Length-1; i++)
                 groceriesCart[i] = groceriesCart[i + 1];
             Array.Resize(ref groceriesCart, groceriesCart.Length-1);
+            return groceriesCart;
+        }
+
+        public Array AddNewProduct(string name, int price, Product[] groceriesCart)
+        {
+            Array.Resize(ref groceriesCart, groceriesCart.Length + 1);
+            groceriesCart[groceriesCart.Length - 1] = new Product(name, price);
+            return groceriesCart;
+        }
+
+        public double CalculateMidPriceInCart(Product[] groceriesCart)
+        {
+            return CalculateTotal(groceriesCart) / groceriesCart.Length;
         }
     }
 }
