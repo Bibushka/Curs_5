@@ -6,13 +6,17 @@ namespace Cycling
 
     public struct Cyclists
     {
+        public string name;
         public double diametre;
         public double numberOfRotations;
+        public double[] rotationsPerSecond;
 
-        public Cyclists(double diametre, double numberOfRotations)
+        public Cyclists(string name, double diametre, double numberOfRotations)
         {
+            this.name = name;
             this.diametre = diametre;
             this.numberOfRotations = numberOfRotations;
+            this.rotationsPerSecond = new double [3];
         }
     }
 
@@ -23,7 +27,8 @@ namespace Cycling
         public void GetDistance()
         {
             var cyclingTeam = new Cyclists[]
-            {new Cyclists (1, 200), new Cyclists(1.2, 215), new Cyclists(1.5, 220)};
+            {new Cyclists ("Steve", 1, 200, [23, 26, 27 ]), new Cyclists("Harvey", 1.2, 215, { 25, 26, 21 }),
+            new Cyclists("John", 1.5, 220, { 24, 26, 29 })};
             CollectionAssert.AreEqual(new double[] { 628, 810.12, 1036.2 }, CalculateDistance(cyclingTeam));
         }
 
