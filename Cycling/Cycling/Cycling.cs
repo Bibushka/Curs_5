@@ -17,6 +17,12 @@ namespace Cycling
             this.diametre = diametre;
             this.rotationsPerSecond = numberOfRotations;
         }
+
+        public double GetDistance(double rotationsPerSecond)
+        {
+            return 3.14 * rotationsPerSecond * diametre;
+
+        }
     }
 
     [TestClass]
@@ -25,27 +31,21 @@ namespace Cycling
         [TestMethod]
         public void GetDistance()
         {
-            var steve = new Cyclist ("steve", 1, new double [] { 23, 26, 27 });
+            var steve = new Cyclist("steve", 1, new double[] { 23, 26, 27 });
             var harvey = new Cyclist("Harvey", 1.2, new double[] { 25, 26, 21 });
-            var john = new Cyclist ("John", 1.5, new double [] { 24, 26, 29 });
+            var john = new Cyclist("John", 1.5, new double[] { 24, 26, 29 });
             var cyclingTeam = new Cyclist[] { steve, harvey, john };
-            CollectionAssert.AreEqual(new double[] { 238.64000000000002, 271.296, 372.09000000000003 }, CalculateDistance(cyclingTeam));
+            Assert.AreEqual(882.026, CalculateDistance(cyclingTeam),3);
         }
 
-        public double[] CalculateDistance(Cyclist[] cyclingTeam)
-        {
-            double[] distance = new double [3];
-            for (int i = 0; i < cyclingTeam.Length; i++)
-                distance[i] = CalculateDistancePerCyclist(cyclingTeam[i].rotationsPerSecond, cyclingTeam[i].diametre);
-            return distance;
-        }
-
-        public double CalculateDistancePerCyclist(double [] rotationsPerSecond, double diametre)
+        public double CalculateDistance(Cyclist[] cyclingTeam)
         {
             double distance = 0;
-            for (int i = 0; i < rotationsPerSecond.Length; i++)
-                distance += 3.14 * rotationsPerSecond[i] * diametre;
+            for (int i = 0; i < cyclingTeam.Length; i++)
+                for (int j=0; j < cyclingTeam[i].rotationsPerSecond.Length; j++)
+                    distance += cyclingTeam[i].GetDistance(cyclingTeam[i].rotationsPerSecond[j]);
             return distance;
         }
+        
     }
 }
