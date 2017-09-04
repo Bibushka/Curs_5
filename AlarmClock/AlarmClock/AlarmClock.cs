@@ -3,7 +3,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace AlarmClock
 {
-    enum Days
+    public enum Day
     {
         Monday = 1,
         Tuesday = 2,
@@ -14,24 +14,42 @@ namespace AlarmClock
         Sunday = 64,
     }
 
-    public struct Time
+    public struct Alarm
     {
+        public Day day;
         public int hour;
         public int minute;
 
-        public Time(int hour, int minute)
+        public Alarm(Day day, int hour, int minute)
         {
+            this.day = day;
             this.hour = hour;
             this.minute = minute;
         }
     }
 
     [TestClass]
-    public class UnitTest1
+    public class AlarmClock
     {
         [TestMethod]
-        public void TestMethod1()
+        public void CheckMondayAlarmFail()
         {
+            var mondayAlarm = new Alarm (Day.Monday, 6, 1);
+            Assert.IsFalse(CheckWeekDayAlarm(mondayAlarm));
+        }
+
+        [TestMethod]
+        public void CheckMondayAlarm()
+        {
+            var mondayAlarm = new Alarm(Day.Monday, 6, 0);
+            Assert.IsTrue(CheckWeekDayAlarm(mondayAlarm));
+        }
+
+        public bool CheckWeekDayAlarm(Alarm setAlarm)
+        {
+            if (setAlarm.day == Day.Monday && setAlarm.hour == 6 && setAlarm.minute == 0)
+                return true;
+            return false;
         }
     }
 }
