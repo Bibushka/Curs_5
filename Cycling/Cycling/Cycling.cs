@@ -55,7 +55,9 @@ namespace Cycling
             var harvey = new Cyclist("Harvey", 1.2, new double[] { 25, 26, 21 });
             var john = new Cyclist("John", 1.5, new double[] { 24, 26, 29 });
             var cyclingTeam = new Cyclist[] { steve, harvey, john };
-            CollectionAssert.AreEqual(new string[] { "John", "2" }, FindFastestCyclist(cyclingTeam));
+            var theFastestCyclist = new FastestCyclist();
+            theFastestCyclist = FindFastestCyclist(cyclingTeam);
+            Assert.AreEqual(new FastestCyclist (2, "John"), theFastestCyclist);
         }
 
         [TestMethod]
@@ -76,21 +78,19 @@ namespace Cycling
             return distance;
         }
 
-        public string[] FindFastestCyclist(Cyclist[] cyclingTeam)
+        public FastestCyclist FindFastestCyclist(Cyclist[] cyclingTeam)
         {
             double rotation = 0;
-            string name = null;
-            int index = 0;
+            var theFastestCyclist = new FastestCyclist();
             for (int i = 0; i < cyclingTeam.Length; i++)
                 for (int j = 0; j < cyclingTeam[i].rotationsPerSecond.Length; j++)
                     if (cyclingTeam[i].rotationsPerSecond[j] > rotation)
                     {
-                        name = cyclingTeam[i].name;
-                        index = j;
+                        theFastestCyclist.name = cyclingTeam[i].name;
+                        theFastestCyclist.index = j;
                         rotation = cyclingTeam[i].rotationsPerSecond[j];
                     }
-            string [] fastestCyclist = new string[] { name, Convert.ToString(index)};
-            return fastestCyclist;
+            return theFastestCyclist;
         }
 
         public double FindBestAverageSpeed(Cyclist[] cyclingTeam)
@@ -108,6 +108,18 @@ namespace Cycling
                 if (speeds[i] > maxValue)
                     maxValue = speeds[i];
             return maxValue;
+        }
+    }
+
+    public struct FastestCyclist
+    {
+        public int index;
+        public string name;
+
+        public FastestCyclist(int index, string name)
+        {
+            this.index = index;
+            this.name = name;
         }
     }
 }
