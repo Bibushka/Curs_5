@@ -45,11 +45,39 @@ namespace AlarmClock
             Assert.IsTrue(CheckWeekDayAlarm(mondayAlarm));
         }
 
+        [TestMethod]
+        public void CheckWeekDayAlarm()
+        {
+            var weekDayAlarm = new Alarm(Day.Thursday, 6, 0);
+            Assert.IsTrue(CheckWeekDayAlarm(weekDayAlarm));
+        }
+
+        [TestMethod]
+        public void CheckWeekendDayAlarm()
+        {
+            var weekendDayAlarm = new Alarm(Day.Saturday, 8, 0);
+            Assert.IsTrue(CheckWeekendDayAlarm(weekendDayAlarm));
+        }
+
         public bool CheckWeekDayAlarm(Alarm setAlarm)
         {
-            if (setAlarm.day == Day.Monday && setAlarm.hour == 6 && setAlarm.minute == 0)
+            if (CheckDay(setAlarm.day) && setAlarm.hour == 6 && setAlarm.minute == 0)
                 return true;
             return false;
+        }
+
+        public bool CheckWeekendDayAlarm(Alarm setAlarm)
+        {
+            if (!CheckDay(setAlarm.day) && setAlarm.hour == 8 && setAlarm.minute == 0)
+                return true;
+            return false;
+        }
+
+        public bool CheckDay(Day day)
+        {
+            if (day == Day.Saturday || day == Day.Sunday)
+                return false;
+            return true;
         }
     }
 }
