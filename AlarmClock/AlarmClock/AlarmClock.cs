@@ -28,56 +28,56 @@ namespace AlarmClock
         }
     }
 
+    public struct Time
+    {
+        public Day day;
+        public int hour;
+        public int minute;
+
+        public Time(Day day, int hour, int minute)
+        {
+            this.day = day;
+            this.hour = hour;
+            this.minute = minute;
+        }
+
+    }
+
     [TestClass]
     public class AlarmClock
     {
         [TestMethod]
-        public void CheckMondayAlarmFail()
-        {
-            var mondayAlarm = new Alarm (Day.Monday, 6, 1);
-            Assert.IsFalse(CheckWeekDayAlarm(mondayAlarm));
-        }
-
-        [TestMethod]
-        public void CheckMondayAlarm()
-        {
-            var mondayAlarm = new Alarm(Day.Monday, 6, 0);
-            Assert.IsTrue(CheckWeekDayAlarm(mondayAlarm));
-        }
-
-        [TestMethod]
         public void CheckWeekDayAlarm()
         {
-            var weekDayAlarm = new Alarm(Day.Thursday, 6, 0);
-            Assert.IsTrue(CheckWeekDayAlarm(weekDayAlarm));
+            var weekDayAlarm = 
+                new Alarm(Day.Monday|Day.Tuesday|Day.Wednesday|Day.Thursday|Day.Friday, 6, 0);
+            var currentTime = new Time(Day.Tuesday, 6, 0);
+            Assert.IsTrue(CheckAlarm(weekDayAlarm, currentTime));
         }
 
         [TestMethod]
         public void CheckWeekendDayAlarm()
         {
-            var weekendDayAlarm = new Alarm(Day.Saturday, 8, 0);
-            Assert.IsTrue(CheckWeekendDayAlarm(weekendDayAlarm));
+            var weekendDayAlarm = new Alarm(Day.Saturday|Day.Sunday, 8, 0);
+            var currentTime = new Time(Day.Saturday, 8, 0);
+            Assert.IsTrue(CheckAlarm(weekendDayAlarm, currentTime));
         }
 
-        public bool CheckWeekDayAlarm(Alarm setAlarm)
+        [TestMethod]
+        public void CheckWeekendDayAlarm1()
         {
-            if (CheckDay(setAlarm.day) && setAlarm.hour == 6 && setAlarm.minute == 0)
+            var weekendDayAlarm = new Alarm(Day.Saturday | Day.Sunday, 8, 0);
+            var currentTime = new Time(Day.Monday, 8, 0);
+            Assert.IsTrue(CheckAlarm(weekendDayAlarm, currentTime));
+        }
+
+
+        public bool CheckAlarm(Alarm setAlarm, Time currentTime)
+        {
+            if (setAlarm.day == currentTime.day && setAlarm.hour == currentTime.hour &&
+                setAlarm.minute == currentTime.minute)
                 return true;
             return false;
-        }
-
-        public bool CheckWeekendDayAlarm(Alarm setAlarm)
-        {
-            if (!CheckDay(setAlarm.day) && setAlarm.hour == 8 && setAlarm.minute == 0)
-                return true;
-            return false;
-        }
-
-        public bool CheckDay(Day day)
-        {
-            if (day == Day.Saturday || day == Day.Sunday)
-                return false;
-            return true;
         }
     }
 }
