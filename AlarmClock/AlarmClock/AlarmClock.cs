@@ -70,13 +70,13 @@ namespace AlarmClock
         {
             var weekendDayAlarm = new Alarm(Day.Saturday | Day.Sunday, 8, 0);
             var currentTime = new Time(Day.Monday, 8, 0);
-            Assert.IsTrue(CheckAlarm(weekendDayAlarm, currentTime));
+            Assert.IsFalse(CheckAlarm(weekendDayAlarm, currentTime));
         }
 
 
         public bool CheckAlarm(Alarm setAlarm, Time currentTime)
         {
-            if (setAlarm.day != currentTime.day && setAlarm.hour == currentTime.hour &&
+            if ((setAlarm.day & currentTime.day)!=0 && setAlarm.hour == currentTime.hour &&
                 setAlarm.minute == currentTime.minute)
                 return true;
             return false;
