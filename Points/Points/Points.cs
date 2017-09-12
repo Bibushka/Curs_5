@@ -6,23 +6,12 @@ namespace Points
 
     public struct Point
     {
-        int x;
-        int y;
-        public int[,] trail;
-        public int[,] trailToCheck;
-        public Point(int x, int y, int[,] trail)
+        public int x;
+        public int y;
+        public Point(int x, int y)
         {
             this.x = x;
             this.y = y;
-            this.trail = trail;
-            this.trailToCheck = new int[trail.Length/2+1, 2];
-            trailToCheck[0, 0] = x;
-            trailToCheck[0, 1] = y;
-            for (int i = 0; i < trail.Length/2; i++)
-            {
-                trailToCheck[i+1, 0] = trailToCheck[i, 0] + trail[i, 0];
-                trailToCheck[i+1, 1] = trailToCheck[i, 1] + trail[i, 1];
-            }
         }
     }
     
@@ -32,23 +21,40 @@ namespace Points
         [TestMethod]
         public void CheckIfThereIsAnInterseciom()
         {
-            var initialPoint = new Point (0, 0, new int[,] { { -1, 1 }, { 1, -1 } });
-            Assert.IsTrue(CheckIntersection(initialPoint.trailToCheck));
+            var initialPoint = new Point (0, 0);
+            var secondPoint = new Point(-1, 1);
+            var thirdPoint = new Point (1, -1);
+            var trail = new Point[] {initialPoint, secondPoint, thirdPoint};
+            Assert.IsTrue(CheckIntersection(trail));
         }
 
         [TestMethod]
         public void CheckIfThereIsNotAnInterseciom()
         {
-            var initialPoint = new Point(0, 0, new int[,] { { -1, 1 }, { 1, 1 } });
-            Assert.IsFalse(CheckIntersection(initialPoint.trailToCheck));
+            var initialPoint = new Point(0, 0);
+            var secondPoint = new Point(-1, 1);
+            var thirdPoint = new Point(1, 1);
+            var trail = new Point[] { initialPoint, secondPoint, thirdPoint };
+            Assert.IsTrue(CheckIntersection(trail));
         }
 
-        public bool CheckIntersection(int[,] trailToCheck)
+        public bool CheckIntersection(Point[] trail)
         {
-            for (int i = 0; i < trailToCheck.Length / 2 - 1; i++)
-                for (int j = 1; j < trailToCheck.Length / 2; i++)
-                    if (trailToCheck[i, 0] == trailToCheck[j, 0] &&
-                        trailToCheck[i, 1] == trailToCheck[j, 1])
+            var trailToCheck = new Point[trail.Length];
+            for (int i = 1; i < trailToCheck.Length; i++)
+            {
+                trailToCheck[i].x = trailToCheck[i - 1].x + trail[i].x;
+                trailToCheck[i].y = trailToCheck[i - 1].y + trail[i].y;
+            }
+            return CheckTrail(trailToCheck);
+        }
+
+        public bool CheckTrail(Point[] trailToCheck)
+        {
+            for (int i = 0; i < trailToCheck.Length - 1; i++)
+                for (int j = 1; j < trailToCheck.Length; j++)
+                    if ((trailToCheck[i].x == trailToCheck[j].x) &&
+                        (trailToCheck[i].y == trailToCheck[i].y))
                         return true;
             return false;
         }
