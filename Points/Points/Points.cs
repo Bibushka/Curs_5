@@ -13,6 +13,16 @@ namespace Points
             this.x = x;
             this.y = y;
         }
+
+        public Point Move(Point trailToCheck)
+        {
+            return new Point ( this.x = this.x + trailToCheck.x, this.y = this.y + trailToCheck.y);
+        }
+
+        public bool Check(Point trailToCheckPoint)
+        {
+            return this.x == trailToCheckPoint.x && this.y == trailToCheckPoint.y;
+        }
     }
     
     [TestClass]
@@ -35,26 +45,22 @@ namespace Points
             var secondPoint = new Point(-1, 1);
             var thirdPoint = new Point(1, 1);
             var trail = new Point[] { initialPoint, secondPoint, thirdPoint };
-            Assert.IsTrue(CheckIntersection(trail));
+            Assert.IsFalse(CheckIntersection(trail));
         }
 
         public bool CheckIntersection(Point[] trail)
         {
             var trailToCheck = new Point[trail.Length];
             for (int i = 1; i < trailToCheck.Length; i++)
-            {
-                trailToCheck[i].x = trailToCheck[i - 1].x + trail[i].x;
-                trailToCheck[i].y = trailToCheck[i - 1].y + trail[i].y;
-            }
+                trailToCheck[i] = trail[i].Move(trailToCheck[i - 1]);
             return CheckTrail(trailToCheck);
         }
 
         public bool CheckTrail(Point[] trailToCheck)
         {
             for (int i = 0; i < trailToCheck.Length - 1; i++)
-                for (int j = 1; j < trailToCheck.Length; j++)
-                    if ((trailToCheck[i].x == trailToCheck[j].x) &&
-                        (trailToCheck[i].y == trailToCheck[i].y))
+                for (int j = i + 1; j < trailToCheck.Length; j++)
+                    if (trailToCheck[i].Check(trailToCheck[j]))
                         return true;
             return false;
         }
