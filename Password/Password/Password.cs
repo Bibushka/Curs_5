@@ -39,6 +39,13 @@ namespace Password
 
         public bool ValidatePassword(Password yourPassword)
         {
+            string lowerCaseLetters = GenerateLetters(yourPassword.numberOfSmallLetters);
+            string upperCaseLetters = GenerateLetters(yourPassword.numberOfCapitalLetters);
+            string digits = GenerateDigits(yourPassword.numberOfDigits);
+            string characters = GenerateCharacters(yourPassword.numberOfCharacters);
+            string passwordToCheck = yourPassword.GeneratePassword(lowerCaseLetters, 
+                upperCaseLetters, digits, characters);
+
             return false;
         }
     }
