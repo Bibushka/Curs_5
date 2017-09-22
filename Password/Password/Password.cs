@@ -23,7 +23,7 @@ namespace Password
             string digits, string characters)
         {
             string yourPassword = string.Empty;
-            return yourPassword = smallLetters + capitalLetters.ToUpper() + digits + characters;
+            return yourPassword = smallLetters + capitalLetters + digits + characters;
         }
     }
 
@@ -39,8 +39,8 @@ namespace Password
 
         public bool ValidatePassword(Password yourPassword)
         {
-            string lowerCaseLetters = GenerateLetters(yourPassword.numberOfSmallLetters);
-            string upperCaseLetters = GenerateLetters(yourPassword.numberOfCapitalLetters);
+            string lowerCaseLetters = GenerateSmallLetters(yourPassword.numberOfSmallLetters);
+            string upperCaseLetters = GenerateCapitalLetters(yourPassword.numberOfCapitalLetters);
             string digits = GenerateDigits(yourPassword.numberOfDigits);
             string characters = GenerateCharacters(yourPassword.numberOfCharacters);
             string passwordToCheck = yourPassword.GeneratePassword(lowerCaseLetters, 
@@ -48,11 +48,43 @@ namespace Password
             return true;
         }
 
-        public string GenerateLetters(int numberOfLetters)
+        public string GenerateSmallLetters(int numberOfLetters)
         {
             string letters = string.Empty;
+            char testLetter;
+            string similarLetters = "lo";
             for (int i = 0; i < numberOfLetters; i++)
-                letters = letters + GenerateRandom('a', 'z');
+            {
+                testLetter = GenerateRandom('a', 'z');
+                string testString = testLetter.ToString();
+                while (similarLetters.Contains(testString))
+                {
+                    testLetter = GenerateRandom('A', 'Z');
+                    testString = testLetter.ToString();
+                }
+                letters = letters + testString;
+
+            }
+            return letters;
+        }
+
+        public string GenerateCapitalLetters(int numberOfLetters)
+        {
+            string letters = string.Empty;
+            char testLetter;
+            string similarLetters = "IO";
+            for (int i = 0; i < numberOfLetters; i++)
+            {
+                testLetter = GenerateRandom('A', 'Z');
+                string testString = testLetter.ToString();
+                while (similarLetters.Contains(testString))
+                {
+                    testLetter = GenerateRandom('A', 'Z');
+                    testString = testLetter.ToString();
+                }
+                letters = letters + testString;
+
+            }
             return letters;
         }
 
@@ -60,7 +92,7 @@ namespace Password
         {
             string digits = string.Empty;
             for (int i = 0; i < numberOfDigits; i++)
-                digits = digits + GenerateRandom('0', '9');
+                digits = digits + GenerateRandom('2', '9');
             return digits;
         }
 
@@ -83,10 +115,11 @@ namespace Password
             return characters;
         }
 
+        Random random = new Random();
+
         public char GenerateRandom(char lowerChar, char upperChar)
         {
-            Random random = new Random();
-            return (char)(random.Next(lowerChar, upperChar));
+            return (char)(random.Next(lowerChar, upperChar+1));
         }
 
     }
