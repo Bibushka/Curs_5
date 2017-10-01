@@ -153,8 +153,6 @@ namespace Password
         {
             var passwordToCheck = new Password(2, 3, 4, 1);
             passwordToCheck.GeneratePassword();
-            passwordToCheck.EliminateSimilarCharacters();
-            passwordToCheck.EliminateAmbiguousCharacters();
             Assert.IsTrue(ValidatePassword(passwordToCheck));
         }
 
@@ -173,6 +171,7 @@ namespace Password
         {
             var passwordToCheck = new Password(2, 3, 4, 1);
             passwordToCheck.GeneratePassword();
+            passwordToCheck.EliminateSimilarCharacters();
             Assert.IsTrue(ValidatePassword(passwordToCheck));
         }
 
@@ -191,6 +190,7 @@ namespace Password
         {
             var passwordToCheck = new Password(2, 3, 4, 1);
             passwordToCheck.GeneratePassword();
+            passwordToCheck.EliminateAmbiguousCharacters();
             Assert.IsTrue(ValidatePassword(passwordToCheck));
         }
 
@@ -212,13 +212,13 @@ namespace Password
             int countOfCharacters = 0;
             for (int i = 0; i < passwordToCheck.yourPassword.Length; i++)
             {
-                if ("abcdefghijkmnpqrstuvwxyz".Contains(passwordToCheck.yourPassword[i].ToString()))
+                if ("abcdefghijklmnopqrstuvwxyz".Contains(passwordToCheck.yourPassword[i].ToString()))
                     countOfLowerCaseLetters++;
-                if ("ABCDEFGHJKLMNPQRSTUVWXYZ".Contains(passwordToCheck.yourPassword[i].ToString()))
+                if ("ABCDEFGHIJKLMNOPQRSTUVWXYZ".Contains(passwordToCheck.yourPassword[i].ToString()))
                     countOfUpperCaseLetters++;
-                if ("23456789".Contains(passwordToCheck.yourPassword[i].ToString()))
+                if ("0123456789".Contains(passwordToCheck.yourPassword[i].ToString()))
                     countOfDigits++;
-                if (!"{ }[]()/\"~,;.<>0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ".Contains(passwordToCheck.yourPassword[i].ToString()))
+                else
                     countOfCharacters++;
             }
             if (countOfLowerCaseLetters == passwordToCheck.numberOfSmallLetters &&
