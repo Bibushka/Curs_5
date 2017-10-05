@@ -8,32 +8,28 @@ namespace Password
         public int numberOfSmallLetters;
         public int numberOfCapitalLetters;
         public int numberOfDigits;
-        public int numberOfCharacters;
+        public int numberOfSimbols;
         public string yourPassword;
-        string smallLetters;
-        string capitalLetters;
-        string digits;
-        string characters;
+        public bool noSimilarChars;
+        public bool noAmbiguousChars;
         Random random;
 
         public Password(int numberOfSmallLetters, int numberOfCapitalLetters,
-            int numberOfDigits, int numberOfCharacters)
+            int numberOfDigits, int numberOfSimbols, bool noSimilarChars, bool noAmbiguousChars)
         {
             this.numberOfSmallLetters = numberOfSmallLetters;
             this.numberOfCapitalLetters = numberOfCapitalLetters;
             this.numberOfDigits = numberOfDigits;
-            this.numberOfCharacters = numberOfCharacters;
-            smallLetters = string.Empty;
-            capitalLetters = string.Empty;
-            digits = string.Empty;
-            characters = string.Empty;
+            this.numberOfSimbols = numberOfSimbols;
+            this.noSimilarChars = noSimilarChars;
+            this.noAmbiguousChars = noAmbiguousChars;
             yourPassword = string.Empty;
             random = new Random();
         }
 
         public string GenerateSmallLetters()
         {
-            return CreatePasswordSegment(numberOfCapitalLetters, 'a', 'z');
+            return CreatePasswordSegment(numberOfSmallLetters, 'a', 'z');
         }
 
         public string GenerateCapitalLetters()
@@ -43,33 +39,38 @@ namespace Password
         
         public string GenerateDigits()
         {
-            return CreatePasswordSegment(numberOfDigits, '0', '9');
+            if (noSimilarChars)
+                return CreatePasswordSegment(numberOfDigits, '0', '9');
+            return CreatePasswordSegment(numberOfDigits, '2', '9');
         }
 
-        public string GenerateCharacters()
+        public string GenerateSimbols()
         {
-            if (numberOfCharacters == 0)
-                return "";
+            string simbols = string.Empty;
+            string testString = string.Empty;
             char testChar;
-            string badChar = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-            for (int i = 0; i < numberOfCharacters; i++)
+            string badChar;
+            if (noAmbiguousChars)
+                badChar = "{}[]()/\"~,;.<>0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            else
+                badChar = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            for (int i = 0; i < numberOfSimbols; i++)
             {
-                testChar = GenerateRandom('!', '|');
-                string testString = testChar.ToString();
-                while (badChar.Contains(testString))
+                do
                 {
                     testChar = GenerateRandom('!', '|');
                     testString = testChar.ToString();
                 }
-                characters = characters + testString;
+                while (badChar.Contains(testString));
+                simbols = simbols + testChar;
             }
-            return characters;
+            return simbols;
         }
 
         public void GeneratePassword()
         {
             yourPassword = GenerateSmallLetters() + GenerateCapitalLetters() + 
-                GenerateDigits() + GenerateCharacters();
+                GenerateDigits() + GenerateSimbols();
         }
 
         public char GenerateRandom(char firstChar, char lastChar)
@@ -79,64 +80,12 @@ namespace Password
 
         public string CreatePasswordSegment(int numberOfCharacters, char firstChar, char lastChar)
         {
-            if (numberOfCharacters == 0)
-                return "";
             string characters = string.Empty;
             for (int i = 0; i < numberOfCharacters; i++)
                 characters = characters + GenerateRandom(firstChar, lastChar);
             return characters;
         }
-
-        public void EliminateSimilarCharacters()
-        {
-            string similarCharacters = "l1Io0O";
-            string badChar = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-            char testChar;
-            for (int i = 0; i < yourPassword.Length; i++)
-                while (similarCharacters.Contains(yourPassword[i].ToString()))
-                {
-                    if (i < numberOfSmallLetters)
-                        yourPassword = 
-                            ChangeCharacterInString(yourPassword, GenerateRandom('a', 'z'), i);
-                    if (i < numberOfSmallLetters + numberOfCapitalLetters)
-                        yourPassword = 
-                            ChangeCharacterInString(yourPassword, GenerateRandom('A', 'Z'), i);
-                    if (i < numberOfSmallLetters + numberOfCharacters + numberOfDigits)
-                        yourPassword = 
-                            ChangeCharacterInString(yourPassword, GenerateRandom('0', '9'), i);
-                    while (badChar.Contains(yourPassword[i].ToString()))
-                    {
-                        testChar = GenerateRandom('!', '|');
-                        yourPassword = ChangeCharacterInString(yourPassword, testChar, i);
-                    }
-                }
-        }
-
-        public void EliminateAmbiguousCharacters()
-        {
-            string ambiguousChar = "{}[]()/\"~,;.<>";
-            string badChar = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-            char testChar;
-            for (int i = 0; i < yourPassword.Length; i++)
-                while (ambiguousChar.Contains(yourPassword[i].ToString()))
-                {
-                    if (i < numberOfSmallLetters)
-                        yourPassword =
-                            ChangeCharacterInString(yourPassword, GenerateRandom('a', 'z'), i);
-                    if (i < numberOfSmallLetters + numberOfCapitalLetters)
-                        yourPassword =
-                            ChangeCharacterInString(yourPassword, GenerateRandom('A', 'Z'), i);
-                    if (i < numberOfSmallLetters + numberOfCharacters + numberOfDigits)
-                        yourPassword =
-                            ChangeCharacterInString(yourPassword, GenerateRandom('0', '9'), i);
-                    while (badChar.Contains(yourPassword[i].ToString()))
-                    {
-                        testChar = GenerateRandom('!', '|');
-                        yourPassword = ChangeCharacterInString(yourPassword, testChar, i);
-                    }
-                }
-        }
-
+                
         public string ChangeCharacterInString(string yourPassword, char Character, int position)
         {
             char[] passwordToRuing = yourPassword.ToCharArray();
@@ -151,7 +100,7 @@ namespace Password
         [TestMethod]
         public void IsPasswordCorrectlyComposed()
         {
-            var passwordToCheck = new Password(2, 3, 4, 1);
+            var passwordToCheck = new Password(2, 3, 4, 1, false, false);
             passwordToCheck.GeneratePassword();
             Assert.IsTrue(ValidatePassword(passwordToCheck));
         }
@@ -159,45 +108,43 @@ namespace Password
         [TestMethod]
         public void IsPasswordInorrectlyComposed()
         {
-            var passwordToCheck = new Password(2, 3, 4, 1);
+            var passwordToCheck = new Password(2, 3, 4, 1, true, false);
             passwordToCheck.GeneratePassword();
             passwordToCheck.yourPassword = 
-                passwordToCheck.ChangeCharacterInString(passwordToCheck.yourPassword, '0', 5);
+                passwordToCheck.ChangeCharacterInString(passwordToCheck.yourPassword, '0', 3);
             Assert.IsFalse(ValidatePassword(passwordToCheck));
         }
 
         [TestMethod]
         public void CheckForSimilarCharactersTrue()
         {
-            var passwordToCheck = new Password(2, 3, 4, 1);
+            var passwordToCheck = new Password(2, 3, 4, 1, false, true);
             passwordToCheck.GeneratePassword();
-            passwordToCheck.EliminateSimilarCharacters();
             Assert.IsTrue(ValidatePassword(passwordToCheck));
         }
 
         [TestMethod]
         public void CheckForSimilarCharactersFalse()
         {
-            var passwordToCheck = new Password(2, 3, 4, 1);
+            var passwordToCheck = new Password(2, 3, 4, 1, false, false);
             passwordToCheck.GeneratePassword();
             passwordToCheck.yourPassword = 
-                passwordToCheck.ChangeCharacterInString(passwordToCheck.yourPassword, '1', 5);
+                passwordToCheck.ChangeCharacterInString(passwordToCheck.yourPassword, 'o', 5);
             Assert.IsFalse(ValidatePassword(passwordToCheck));
         }
 
         [TestMethod]
         public void CheckForAmbiguousCharactersTrue()
         {
-            var passwordToCheck = new Password(2, 3, 4, 1);
+            var passwordToCheck = new Password(2, 3, 4, 1, false, true);
             passwordToCheck.GeneratePassword();
-            passwordToCheck.EliminateAmbiguousCharacters();
             Assert.IsTrue(ValidatePassword(passwordToCheck));
         }
 
         [TestMethod]
         public void CheckForAmbiguousCharactersFalse()
         {
-            var passwordToCheck = new Password(2, 3, 4, 1);
+            var passwordToCheck = new Password(2, 3, 4, 1, false, false);
             passwordToCheck.GeneratePassword();
             passwordToCheck.yourPassword = 
                 passwordToCheck.ChangeCharacterInString(passwordToCheck.yourPassword, '>', 5);
@@ -218,13 +165,13 @@ namespace Password
                     countOfUpperCaseLetters++;
                 if ("0123456789".Contains(passwordToCheck.yourPassword[i].ToString()))
                     countOfDigits++;
-                else
+                if ("!#$%&'()*+,-./:;<=>?@[]^_`{|}~".Contains(passwordToCheck.yourPassword[i].ToString()))
                     countOfCharacters++;
             }
             if (countOfLowerCaseLetters == passwordToCheck.numberOfSmallLetters &&
                 countOfUpperCaseLetters == passwordToCheck.numberOfCapitalLetters &&
                 countOfDigits == passwordToCheck.numberOfDigits &&
-                countOfCharacters == passwordToCheck.numberOfCharacters)
+                countOfCharacters == passwordToCheck.numberOfSimbols)
                 return true;
             return false;
         }
