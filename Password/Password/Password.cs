@@ -27,21 +27,31 @@ namespace Password
             random = new Random();
         }
 
+        public void GeneratePassword()
+        {
+            yourPassword = GenerateSmallLetters() + GenerateCapitalLetters() +
+                GenerateDigits() + GenerateSimbols();
+        }
+
         public string GenerateSmallLetters()
         {
+            if (noSimilarChars)
+                return CreateNoSimilarPasswordSegment(numberOfSmallLetters, false);
             return CreatePasswordSegment(numberOfSmallLetters, 'a', 'z');
         }
 
         public string GenerateCapitalLetters()
         {
+            if (noSimilarChars)
+                return CreateNoSimilarPasswordSegment(numberOfCapitalLetters, true);
             return CreatePasswordSegment(numberOfCapitalLetters, 'A', 'Z');
         }
         
         public string GenerateDigits()
         {
             if (noSimilarChars)
-                return CreatePasswordSegment(numberOfDigits, '0', '9');
-            return CreatePasswordSegment(numberOfDigits, '2', '9');
+                return CreatePasswordSegment(numberOfDigits, '2', '9');
+            return CreatePasswordSegment(numberOfDigits, '0', '9');
         }
 
         public string GenerateSimbols()
@@ -67,12 +77,6 @@ namespace Password
             return simbols;
         }
 
-        public void GeneratePassword()
-        {
-            yourPassword = GenerateSmallLetters() + GenerateCapitalLetters() + 
-                GenerateDigits() + GenerateSimbols();
-        }
-
         public char GenerateRandom(char firstChar, char lastChar)
         {
             return (char)(random.Next(firstChar, lastChar + 1));
@@ -84,6 +88,34 @@ namespace Password
             for (int i = 0; i < numberOfCharacters; i++)
                 characters = characters + GenerateRandom(firstChar, lastChar);
             return characters;
+        }
+
+        public string CreateNoSimilarPasswordSegment(int numberOfLetters, bool toUpperLetters)
+        {
+            string letters = string.Empty;
+            string badLowerChar = "lo";
+            string badUpperChar = "IO";
+            char testChar;
+            string testString = string.Empty;
+            for (int i = 0; i < numberOfLetters; i++)
+            {
+                if(toUpperLetters)
+                    do
+                    {
+                        testChar = GenerateRandom('A', 'Z');
+                        testString = testChar.ToString();
+                    }
+                    while (badUpperChar.Contains(testString));
+                else
+                    do
+                    {
+                        testChar = GenerateRandom('a', 'z');
+                        testString = testChar.ToString();
+                    }
+                    while (badLowerChar.Contains(testString));
+                letters = letters + testChar;
+            }
+            return letters;
         }
                 
         public string ChangeCharacterInString(string yourPassword, char Character, int position)
@@ -100,7 +132,7 @@ namespace Password
         [TestMethod]
         public void IsPasswordCorrectlyComposed()
         {
-            var passwordToCheck = new Password(2, 3, 4, 1, false, false);
+            var passwordToCheck = new Password(2, 3, 4, 1, true, true);
             passwordToCheck.GeneratePassword();
             Assert.IsTrue(ValidatePassword(passwordToCheck));
         }
@@ -108,7 +140,7 @@ namespace Password
         [TestMethod]
         public void IsPasswordInorrectlyComposed()
         {
-            var passwordToCheck = new Password(2, 3, 4, 1, true, false);
+            var passwordToCheck = new Password(2, 3, 4, 1, true, true);
             passwordToCheck.GeneratePassword();
             passwordToCheck.yourPassword = 
                 passwordToCheck.ChangeCharacterInString(passwordToCheck.yourPassword, '0', 3);
@@ -118,7 +150,7 @@ namespace Password
         [TestMethod]
         public void CheckForSimilarCharactersTrue()
         {
-            var passwordToCheck = new Password(2, 3, 4, 1, false, true);
+            var passwordToCheck = new Password(2, 3, 4, 1, true, true);
             passwordToCheck.GeneratePassword();
             Assert.IsTrue(ValidatePassword(passwordToCheck));
         }
@@ -126,7 +158,7 @@ namespace Password
         [TestMethod]
         public void CheckForSimilarCharactersFalse()
         {
-            var passwordToCheck = new Password(2, 3, 4, 1, false, false);
+            var passwordToCheck = new Password(2, 3, 4, 1, true, true);
             passwordToCheck.GeneratePassword();
             passwordToCheck.yourPassword = 
                 passwordToCheck.ChangeCharacterInString(passwordToCheck.yourPassword, 'o', 5);
@@ -136,7 +168,7 @@ namespace Password
         [TestMethod]
         public void CheckForAmbiguousCharactersTrue()
         {
-            var passwordToCheck = new Password(2, 3, 4, 1, false, true);
+            var passwordToCheck = new Password(2, 3, 4, 1, true, true);
             passwordToCheck.GeneratePassword();
             Assert.IsTrue(ValidatePassword(passwordToCheck));
         }
@@ -144,7 +176,7 @@ namespace Password
         [TestMethod]
         public void CheckForAmbiguousCharactersFalse()
         {
-            var passwordToCheck = new Password(2, 3, 4, 1, false, false);
+            var passwordToCheck = new Password(2, 3, 4, 1, true, true);
             passwordToCheck.GeneratePassword();
             passwordToCheck.yourPassword = 
                 passwordToCheck.ChangeCharacterInString(passwordToCheck.yourPassword, '>', 5);
