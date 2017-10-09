@@ -36,17 +36,17 @@ namespace Password
         public string GenerateSmallLetters()
         {
             if (noSimilarChars)
-                return CreateNoSimilarPasswordSegment(numberOfSmallLetters, false);
+                return CreateNoSimilarPasswordSegment(numberOfSmallLetters, 'a', 'z', false);
             return CreatePasswordSegment(numberOfSmallLetters, 'a', 'z');
         }
 
         public string GenerateCapitalLetters()
         {
             if (noSimilarChars)
-                return CreateNoSimilarPasswordSegment(numberOfCapitalLetters, true);
+                return CreateNoSimilarPasswordSegment(numberOfCapitalLetters, 'A', 'Z', true);
             return CreatePasswordSegment(numberOfCapitalLetters, 'A', 'Z');
         }
-        
+
         public string GenerateDigits()
         {
             if (noSimilarChars)
@@ -90,34 +90,41 @@ namespace Password
             return characters;
         }
 
-        public string CreateNoSimilarPasswordSegment(int numberOfLetters, bool toUpperLetters)
+        public string CreateNoSimilarPasswordSegment(int numberOfLetters, char firstChar,
+            char lastChar, bool toUpperLetters)
         {
             string letters = string.Empty;
             string badLowerChar = "lo";
             string badUpperChar = "IO";
             char testChar;
             string testString = string.Empty;
-            for (int i = 0; i < numberOfLetters; i++)
+            while (toUpperLetters && numberOfLetters != 0)
             {
-                if(toUpperLetters)
-                    do
-                    {
-                        testChar = GenerateRandom('A', 'Z');
-                        testString = testChar.ToString();
-                    }
-                    while (badUpperChar.Contains(testString));
-                else
-                    do
-                    {
-                        testChar = GenerateRandom('a', 'z');
-                        testString = testChar.ToString();
-                    }
-                    while (badLowerChar.Contains(testString));
-                letters = letters + testChar;
+                testChar = GenerateRandom(firstChar, lastChar);
+                testString = testChar.ToString();
+                while (badUpperChar.Contains(testString))
+                {
+                    testChar = GenerateRandom(firstChar, lastChar);
+                    testString = testChar.ToString();
+                }
+                letters = letters + testString;
+                numberOfLetters--;
+            }
+            while (!toUpperLetters && numberOfLetters!=0)
+            {
+                testChar = GenerateRandom(firstChar, lastChar);
+                testString = testChar.ToString();
+                while (badLowerChar.Contains(testString))
+                {
+                    testChar = GenerateRandom(firstChar, lastChar);
+                    testString = testChar.ToString();
+                }
+                letters = letters + testString;
+                numberOfLetters--;
             }
             return letters;
         }
-                
+
         public string ChangeCharacterInString(string yourPassword, char Character, int position)
         {
             char[] passwordToRuing = yourPassword.ToCharArray();
