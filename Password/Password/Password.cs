@@ -36,14 +36,14 @@ namespace Password
         public string GenerateSmallLetters()
         {
             if (noSimilarChars)
-                return CreateNoSimilarPasswordSegment(numberOfSmallLetters, 'a', 'z', false);
+                return CreateNoSimilarPasswordSegment(numberOfSmallLetters, 'a', 'z', "lo");
             return CreatePasswordSegment(numberOfSmallLetters, 'a', 'z');
         }
 
         public string GenerateCapitalLetters()
         {
             if (noSimilarChars)
-                return CreateNoSimilarPasswordSegment(numberOfCapitalLetters, 'A', 'Z', true);
+                return CreateNoSimilarPasswordSegment(numberOfCapitalLetters, 'A', 'Z', "IO");
             return CreatePasswordSegment(numberOfCapitalLetters, 'A', 'Z');
         }
 
@@ -91,30 +91,16 @@ namespace Password
         }
 
         public string CreateNoSimilarPasswordSegment(int numberOfLetters, char firstChar,
-            char lastChar, bool toUpperLetters)
+            char lastChar, string  badLetters)
         {
             string letters = string.Empty;
-            string badLowerChar = "lo";
-            string badUpperChar = "IO";
             char testChar;
             string testString = string.Empty;
-            while (toUpperLetters && numberOfLetters != 0)
+            while (numberOfLetters != 0)
             {
                 testChar = GenerateRandom(firstChar, lastChar);
                 testString = testChar.ToString();
-                while (badUpperChar.Contains(testString))
-                {
-                    testChar = GenerateRandom(firstChar, lastChar);
-                    testString = testChar.ToString();
-                }
-                letters = letters + testString;
-                numberOfLetters--;
-            }
-            while (!toUpperLetters && numberOfLetters!=0)
-            {
-                testChar = GenerateRandom(firstChar, lastChar);
-                testString = testChar.ToString();
-                while (badLowerChar.Contains(testString))
+                while (badLetters.Contains(testString))
                 {
                     testChar = GenerateRandom(firstChar, lastChar);
                     testString = testChar.ToString();
