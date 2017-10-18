@@ -98,17 +98,12 @@ namespace Password
             string letters = string.Empty;
             char testChar;
             string testString = string.Empty;
-            while (numberOfLetters != 0)
+            while (letters.Length != numberOfLetters)
             {
                 testChar = GenerateRandom(firstChar, lastChar);
                 testString = testChar.ToString();
-                while (badLetters.Contains(testString))
-                {
-                    testChar = GenerateRandom(firstChar, lastChar);
-                    testString = testChar.ToString();
-                }
-                letters = letters + testString;
-                numberOfLetters--;
+                if (!badLetters.Contains(testString))
+                    letters = letters + testString;
             }
             return letters;
         }
@@ -125,116 +120,88 @@ namespace Password
     public class Passwords
     {
         [TestMethod]
-        public void UpperLettersCheck()
+        public void UpperLettersCheckNoSimilar()
         {
             var passwordToCheck = new Password(2, 3, 4, 1, true, true);
             passwordToCheck.GeneratePassword();
-            if (passwordToCheck.noSimilarChars)
-                Assert.IsTrue(CheckForUpperLettersNoSimilar(passwordToCheck));
-            Assert.IsTrue(CheckForUpperLetters(passwordToCheck));
+            Assert.AreEqual(passwordToCheck.numberOfCapitalLetters, 
+                CheckPasswordFragments(passwordToCheck.yourPassword, 
+                string.Join("", Enumerable.Range('A',26).Select(c => (char) c).
+                Where(c => !"IO".Contains(c)))));
+        }
+
+        [TestMethod]
+        public void UpperLettersCheck()
+        {
+            var passwordToCheck = new Password(2, 3, 4, 1, false, true);
+            passwordToCheck.GeneratePassword();
+            Assert.AreEqual(passwordToCheck.numberOfCapitalLetters,
+                CheckPasswordFragments(passwordToCheck.yourPassword,
+                string.Join("", Enumerable.Range('A', 26).Select(c => (char)c))));
+        }
+
+        [TestMethod]
+        public void LowerLettersCheckNoSimilar()
+        {
+            var passwordToCheck = new Password(2, 3, 4, 1, true, true);
+            passwordToCheck.GeneratePassword();
+            Assert.AreEqual(passwordToCheck.numberOfSmallLetters,
+                CheckPasswordFragments(passwordToCheck.yourPassword,
+                string.Join("", Enumerable.Range('a', 26).Select(c => (char)c).
+                Where(c => !"lo".Contains(c)))));
         }
 
         [TestMethod]
         public void LowerLettersCheck()
         {
+            var passwordToCheck = new Password(2, 3, 4, 1, false, true);
+            passwordToCheck.GeneratePassword();
+            Assert.AreEqual(passwordToCheck.numberOfSmallLetters,
+                CheckPasswordFragments(passwordToCheck.yourPassword,
+                string.Join("", Enumerable.Range('a', 26).Select(c => (char)c))));
+        }
+
+        [TestMethod]
+        public void CharactersCheckNoAmbigouos()
+        {
             var passwordToCheck = new Password(2, 3, 4, 1, true, true);
             passwordToCheck.GeneratePassword();
-            if (passwordToCheck.noSimilarChars)
-                Assert.IsTrue(CheckForLowerLettersNoSimilar(passwordToCheck));
-            Assert.IsTrue(CheckForLowerLetters(passwordToCheck));
+            Assert.AreEqual(passwordToCheck.numberOfSimbols, CheckPasswordFragments(
+                passwordToCheck.yourPassword, "#$%&*+-:=?@^_`|"));
         }
 
         [TestMethod]
         public void CharactersCheck()
         {
-            var passwordToCheck = new Password(2, 3, 4, 1, true, true);
+            var passwordToCheck = new Password(2, 3, 4, 1, true, false);
             passwordToCheck.GeneratePassword();
-            if (passwordToCheck.noAmbiguousChars)
-                Assert.IsTrue(CheckForCharactersNoAmbiguous(passwordToCheck));
-            Assert.IsTrue(CheckForCharacters(passwordToCheck));
+            Assert.AreEqual(passwordToCheck.numberOfSimbols, CheckPasswordFragments(
+                passwordToCheck.yourPassword, "#$%&'()*+,-./:;<=>?@[]^_`{|}~"));
         }
 
+        [TestMethod]
+        public void NumbersCheckNoSimilar()
+        {
+            var passwordToCheck = new Password(2, 3, 4, 1, true, true);
+            passwordToCheck.GeneratePassword();
+            Assert.AreEqual(passwordToCheck.numberOfDigits,
+                CheckPasswordFragments(passwordToCheck.yourPassword,
+                string.Join("", Enumerable.Range(2, 8))));
+        }
 
         [TestMethod]
         public void NumbersCheck()
         {
-            var passwordToCheck = new Password(2, 3, 4, 1, true, true);
+            var passwordToCheck = new Password(2, 3, 4, 1, false, true);
             passwordToCheck.GeneratePassword();
-            if (passwordToCheck.noSimilarChars)
-                Assert.IsTrue(CheckForNumbersNoSimilar(passwordToCheck));
-            Assert.IsTrue(CheckForNumbers(passwordToCheck));
+            Assert.AreEqual(passwordToCheck.numberOfDigits,
+                CheckPasswordFragments(passwordToCheck.yourPassword,
+                string.Join("", Enumerable.Range(0, 10))));
         }
 
-        public bool CheckForUpperLetters(Password passwordToCheck)
-        {
-            string upperLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-            int upperLettersToCheck = passwordToCheck.yourPassword.Count(l => upperLetters.Contains(l) ) ;
-            if (upperLettersToCheck == passwordToCheck.numberOfCapitalLetters)  
-                return true;
-            return false;
-        }
-
-        public bool CheckForLowerLetters(Password passwordToCheck)
-        {
-            string lowerLetters = "abcdefghijklmnopqrstuvwxyz";
-            int lowerLettersToCheck = passwordToCheck.yourPassword.Count(l => lowerLetters.Contains(l));
-            if (lowerLettersToCheck == passwordToCheck.numberOfSmallLetters)
-                return true;
-            return false;
-        }
-
-        public bool CheckForUpperLettersNoSimilar(Password passwordToCheck)
-        {
-            string upperLetters = "ABCDEFGHJKLMNPQRSTUVWXYZ";
-            int upperLettersToCheck = passwordToCheck.yourPassword.Count(l => upperLetters.Contains(l));
-            if (upperLettersToCheck == passwordToCheck.numberOfCapitalLetters)
-                return true;
-            return false;
-        }
-
-        public bool CheckForLowerLettersNoSimilar(Password passwordToCheck)
-        {
-            string lowerLetters = "abcdefghijkmnpqrstuvwxyz";
-            int lowerLettersToCheck = passwordToCheck.yourPassword.Count(l => lowerLetters.Contains(l));
-            if (lowerLettersToCheck == passwordToCheck.numberOfSmallLetters)
-                return true;
-            return false;
-        }
-
-        public bool CheckForCharacters(Password passwordToCheck)
-        {
-            string characters = "#$%&'()*+,-./:;<=>?@[]^_`{|}~";
-            int charactersToCheck = passwordToCheck.yourPassword.Count(l => characters.Contains(l));
-            if (charactersToCheck == passwordToCheck.numberOfSimbols)
-                return true;
-            return false;
-        }
-
-        public bool CheckForCharactersNoAmbiguous(Password passwordToCheck)
-        {
-            string characters = "#$%&*+-:=?@^_`|";
-            int charactersToCheck = passwordToCheck.yourPassword.Count(l => characters.Contains(l));
-            if (charactersToCheck == passwordToCheck.numberOfSimbols)
-                return true;
-            return false;
-        }
-
-        public bool CheckForNumbers(Password passwordToCheck)
-        {
-            string numbers = "0123456789";
-            int numbersToCheck = passwordToCheck.yourPassword.Count(l => numbers.Contains(l));
-            if (numbersToCheck == passwordToCheck.numberOfDigits)
-                return true;
-            return false;
-        }
-
-        public bool CheckForNumbersNoSimilar(Password passwordToCheck)
-        {
-            string numbers = "23456789";
-            int numbersToCheck = passwordToCheck.yourPassword.Count(l => numbers.Contains(l));
-            if (numbersToCheck == passwordToCheck.numberOfDigits)
-                return true;
-            return false;
+        public int CheckPasswordFragments(string yourPassword, string badLetters)
+        { 
+            return yourPassword.Count(l => badLetters.Contains(l));
         }
     }
 }
